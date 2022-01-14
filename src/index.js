@@ -1,16 +1,18 @@
-import heicConvert from 'heic-convert'
+const workerUrl = '/tpl/jhin/js/heif-web-display/dist/worker.js?r=4';
+const worker = new Worker(workerUrl);
+const promisePool = {};
 
-const worker = new Worker(new URL('./worker.js?r=3', import.meta.url));
-worker.promisePool = {};
 worker.onmessage = e => {
-  worker.promisePool[e.data.url](e.data.urlPng);
+  promisePool[e.data.url](e.data.urlPng);
+  console.log('ConvertHeicToPng done:', e.data.url);
 };
 
 async function ConvertHeicToPng(url) {
-  let promise = new Promise(function(resolve) {
-    worker.promisePool[url] = resolve;
+  console.log('ConvertHeicToPng:', url);
+  const promise = new Promise(function(resolve) {
+    promisePool[url] = resolve;
     worker.postMessage({'url': url});
   });
   return promise;
 }
-document.ConvertHeicToPng = ConvertHeicToPng
+document.ConvertHeicToPng = ConvertHeicToPng;

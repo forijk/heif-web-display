@@ -5,16 +5,16 @@
     <script src="https://hu60.cn/tpl/jhin/js/jquery-3.1.1.min.js"></script>
 </head>
 <body>
-    <img src="https://file.hu60.cn/file/hash/heic/f2d6673d463cc5f2bc365d3e03daed394840259.heic" alt="heic" />
+<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-cc8cf08f-49f5-4fc5-83c3-ed2a683704d4/dbd3fea0-df18-4a10-8ccf-26b5de1ee42f.heic" alt="heic" />
+
 <script>
     (function() {
         document.querySelectorAll('img').forEach(async x => {
             x.addEventListener('error', async function() {
                 if (x.src.match(/\.hei[cf]\b/i)) {
                     if (!document.ConvertHeicToPng) {
-                        await $.getScript('./dist/main.js?r=3');
+                        await $.getScript('/tpl/jhin/js/heif-web-display/dist/main.js?r=4');
                     }
-                    console.log('ConvertHeicToPng:', x.src);
                     x.src = await document.ConvertHeicToPng(x.src);
                 }
             })

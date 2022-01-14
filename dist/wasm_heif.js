@@ -1,0 +1,1 @@
+wasm/heif/wasm_heif.js
