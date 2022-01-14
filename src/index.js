@@ -1,6 +1,6 @@
 import heicConvert from 'heic-convert'
 
-const worker = new Worker(new URL('./worker.js', import.meta.url));
+const worker = new Worker(new URL('./worker.js?r=3', import.meta.url));
 worker.promisePool = {};
 worker.onmessage = e => {
   worker.promisePool[e.data.url](e.data.urlPng);
