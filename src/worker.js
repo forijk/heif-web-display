@@ -24,7 +24,7 @@ const defaultJpegOption = {
 
 async function convertHeicToPng(url) {
   // find blob from cache
-  try {
+  /*try {
     const cache = await caches.open(cacheName);
     const response = await cache.match(new Request(url));
     if (response) {
@@ -37,7 +37,7 @@ async function convertHeicToPng(url) {
   } catch(e) {
     // ignore
     console.log(e)
-  }
+  }*/
 
   const blob = await fetch(url)
     .then(async (data) => {
@@ -63,13 +63,13 @@ async function convertHeicToPng(url) {
     });
 
   // cache blob
-  try {
+  /*try {
     const cache = await caches.open(cacheName);
     cache.put(new Request(url), new Response(blob));
   } catch(e) {
     // ignore
     console.log(e)
-  }
+  }*/
   return URL.createObjectURL(blob);
 }
 
