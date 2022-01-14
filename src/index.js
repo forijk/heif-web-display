@@ -1,12 +1,16 @@
 import heicConvert from 'heic-convert'
 
-async function ConvertHeicToPng(url) {
-  const output = await fetch(url)
-    .then(async (data) => {
-      const buffer = Buffer.from(await data.arrayBuffer())
-      return heicConvert({ buffer, format: 'PNG' })
-    });
-  return URL.createObjectURL(new Blob([output], {type: 'image/png'}))
-}
+const worker = new Worker(new URL('./worker.js', import.meta.url));
+worker.promisePool = {};
+worker.onmessage = e => {
+  worker.promisePool[e.data.url](e.data.urlPng);
+};
 
+async function ConvertHeicToPng(url) {
+  let promise = new Promise(function(resolve) {
+    worker.promisePool[url] = resolve;
+    worker.postMessage({'url': url});
+  });
+  return promise;
+}
 document.ConvertHeicToPng = ConvertHeicToPng

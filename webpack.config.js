@@ -2,6 +2,9 @@ const webpack = require('webpack');
 
 module.exports = {
     mode: 'production',
+    output: {
+        publicPath: '/tpl/jhin/js/heif-web-display/dist/',
+    },
     resolve: {
         fallback: {
             "path": require.resolve("path-browserify"),
@@ -18,5 +21,5 @@ module.exports = {
         new webpack.ProvidePlugin({
             process: 'process/browser',
         }),
-    ]
+    ],
 };
