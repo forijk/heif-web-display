@@ -13,7 +13,7 @@
             x.addEventListener('error', async function() {
                 if (x.src.match(/\.hei[cf]\b/i)) {
                     if (!document.ConvertHeicToPng) {
-                        await $.getScript('/tpl/jhin/js/heif-web-display/dist/main.js?r=4');
+                        await $.getScript('/tpl/jhin/js/heif-web-display/dist/main.js?r=5');
                     }
                     x.src = await document.ConvertHeicToPng(x.src);
                 }

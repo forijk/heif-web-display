@@ -1,4 +1,4 @@
-const workerUrl = '/tpl/jhin/js/heif-web-display/dist/worker.js?r=4';
+const workerUrl = '/tpl/jhin/js/heif-web-display/dist/worker.js?r=5';
 const worker = new Worker(workerUrl);
 const promisePool = {};
 

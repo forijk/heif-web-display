@@ -28,9 +28,11 @@ async function convertHeicToPng(url) {
     const cache = await caches.open(cacheName);
     const response = await cache.match(new Request(url));
     if (response) {
-      console.log('Found from Cache:', url);
       const blob = await response.blob();
-      return URL.createObjectURL(blob);
+      if (blob.type == 'image/jpeg') {
+        console.log('Found from Cache:', url);
+        return URL.createObjectURL(blob);
+      }
     }
   } catch(e) {
     // ignore
