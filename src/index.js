@@ -10,6 +10,7 @@
       ConvertRgbaToPng(e.data);
     } else {
       promisePool[e.data.url](e.data.urlPng);
+      delete promisePool[e.data.url];
       console.log('Convert Done:', e.data.url);
     }
   };

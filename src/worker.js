@@ -2,7 +2,7 @@
   importScripts('/tpl/jhin/js/heif-web-display/dist/wasm_heif.js');
 
   const cacheName = 'ConvertHeicToPng';
-  const cacheVersion = 'r=7';
+  const cacheVersion = 'r=8';
 
   console.print = console.log;
   console.log = function(...args) {
@@ -14,48 +14,11 @@
   }
 
   if (typeof Atomics == 'undefined') {
-    var Atomics = {
-      store: (arr, index, value) => arr[index] = value,
-      compareExchange: (arr, index, expectValue, newValue) => {
-        const value = arr[index];
-        if (value == expectValue) {
-          arr[index] = newValue;
-        }
-        return value;
-      },
-    }
+    importScripts('/tpl/jhin/js/heif-web-display/dist/atomics.js');
   }
 
   if (typeof OffscreenCanvas == 'undefined') {
-    var OffscreenCanvas = class OffscreenCanvas {
-      static promisePool = {}
-      static resolve(msg) {
-        OffscreenCanvas.promisePool[msg.url](msg.blob);
-      }
-      constructor(width, height) {
-        this.args = {
-          width: width,
-          height: height,
-        };
-      }
-      set _url(url) {
-        this.args.url = url;
-      }
-      getContext(...args) {
-        this.args.getContext = args;
-        return this;
-      }
-      putImageData(...args) {
-        this.args.putImageData = args;
-      }
-      convertToBlob(opt) {
-        return new Promise(resolve => {
-          OffscreenCanvas.promisePool[this.args.url] = resolve;
-          this.args.convertToBlob = opt || {};
-          postMessage(this.args);
-        });
-      }
-    }
+    importScripts('/tpl/jhin/js/heif-web-display/dist/offscreencanvas.js');
   }
 
   const jobQueue = {
