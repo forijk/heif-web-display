@@ -2,7 +2,7 @@
   importScripts('/tpl/jhin/js/heif-web-display/dist/wasm_heif.js');
 
   const cacheName = 'ConvertHeicToPng';
-  const cacheVersion = 'r=9';
+  const cacheVersion = 'r=10';
 
   console.print = console.log;
   console.log = function(...args) {
@@ -47,11 +47,14 @@
 
   async function convertHeicToPng(url) {
     try {
+      console.log('download image...');
+      postMessage({url: url, stat: '正在下载图片'});
       const data = await fetch(url);
       const array = new Uint8Array(await data.arrayBuffer());
       const heif = await wasm_heif({
         onRuntimeInitialized() {
           console.log('decode heif...');
+          postMessage({url: url, stat: '正在解析图片文件'});
         },
       });
       const rgba = heif.decode(array, array.length, true);
@@ -59,6 +62,7 @@
       heif.free();
 
       console.log('draw to canvas...', dim);
+      postMessage({url: url, stat: '正在绘制图片数据'});
       console.log('rgba.length:', rgba.length, 'expected:', dim.width * dim.height * 4);
       const canvas = new OffscreenCanvas(dim.width, dim.height);
       canvas._url = url; // set unique id for polyfill
@@ -67,7 +71,8 @@
         dim.width, dim.height);
       ctx.putImageData(imgData, 0, 0);
 
-      console.log('convert to png...');
+      console.log('convert to jpeg...');
+      postMessage({url: url, stat: '正在转换图片格式'});
       const blob = await canvas.convertToBlob({
         type: 'image/jpeg',
         quality: 0.75,
@@ -86,6 +91,10 @@
     } catch (e) {
       // something went wrong
       console.log(e);
+      postMessage({
+        url: url,
+        stat: '图片解析失败，请尝试刷新: ' + JSON.stringify(e),
+      });
       return null;
     }
   }
@@ -105,6 +114,7 @@
       const response = await cache.match(new Request(data.url));
       if (response && response.statusText == cacheVersion) {
         console.log('Found from Cache:', response.statusText, data.url);
+        postMessage({url: data.url, stat: '已发现图片缓存'});
         const blob = await response.blob();
         const urlPng = URL.createObjectURL(blob);
         if (urlPng) {
