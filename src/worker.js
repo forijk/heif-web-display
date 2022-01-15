@@ -2,7 +2,7 @@
   importScripts('/tpl/jhin/js/heif-web-display/dist/wasm_heif.js');
 
   const cacheName = 'ConvertHeicToPng';
-  const cacheVersion = 'r=10';
+  const cacheVersion = 'r=11';
 
   console.print = console.log;
   console.log = function(...args) {
