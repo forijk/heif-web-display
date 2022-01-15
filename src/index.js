@@ -6,11 +6,32 @@
   worker.onmessage = e => {
     if (e.data.console) {
       console.log(...e.data.console);
+    } else if (e.data.convertToBlob) {
+      ConvertRgbaToPng(e.data);
     } else {
       promisePool[e.data.url](e.data.urlPng);
-      console.log('ConvertHeicToPng done:', e.data.url);
+      console.log('Convert Done:', e.data.url);
     }
   };
+
+  async function ConvertRgbaToPng(args) {
+    console.log('convertToBlob', args.url, args.width, args.height);
+    const canvas = document.createElement('canvas');
+    canvas.width = args.width;
+    canvas.height = args.height;
+    const ctx = canvas.getContext(...args.getContext);
+    ctx.putImageData(...args.putImageData);
+    canvas.toBlob(
+      blob => {
+        worker.postMessage({
+          'url': args.url,
+          'blob': blob,
+        });
+      }, 
+      args.convertToBlob.type,
+      args.convertToBlob.quality
+    );
+  }
 
   async function ConvertHeicToPng(url) {
     console.log('ConvertHeicToPng:', url);
