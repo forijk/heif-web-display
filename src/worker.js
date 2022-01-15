@@ -28,60 +28,72 @@
     chroma_quality: 75,
   };
 
+  console.log = function(...args) {
+    postMessage({console: args});
+  }
+
   async function convertHeicToPng(url) {
-    // find blob from cache
     try {
-      const cache = await caches.open(cacheName);
-      const response = await cache.match(new Request(url));
-      if (response && response.statusText == cacheVersion) {
-        console.log('Found from Cache:', url);
-        const blob = await response.blob();
-        return URL.createObjectURL(blob);
+      // find blob from cache
+      try {
+        const cache = await caches.open(cacheName);
+        const response = await cache.match(new Request(url));
+        if (response && response.statusText == cacheVersion) {
+          console.log('Found from Cache:', url);
+          const blob = await response.blob();
+          return URL.createObjectURL(blob);
+        }
+      } catch(e) {
+        // ignore
+        console.log(e);
       }
-    } catch(e) {
-      // ignore
-      console.log(e)
-    }
 
-    const blob = await fetch(url)
-      .then(async (data) => {
-        const array = new Uint8Array(await data.arrayBuffer());
-        const heif = await wasm_heif({
-          onRuntimeInitialized() {
-            console.log('wasm_heif loaded');
-          },
+      const blob = await fetch(url)
+        .then(async (data) => {
+          const array = new Uint8Array(await data.arrayBuffer());
+          const heif = await wasm_heif({
+            onRuntimeInitialized() {
+              console.log('wasm_heif loaded');
+            },
+          });
+          const rgba = heif.decode(array, array.length, true);
+          const dim = heif.dimensions();
+          heif.free();
+
+          const jpeg = await wasm_mozjpeg({
+            onRuntimeInitialized() {
+              console.log('wasm_mozjpeg loaded');
+            },
+          });
+          let output = jpeg.encode(rgba, dim.width, dim.height,
+            defaultJpegChannels, defaultJpegOption);
+          jpeg.free();
+
+          return new Blob([output], { type: 'image/jpeg' });
         });
-        const rgba = heif.decode(array, array.length, true);
-        const dim = heif.dimensions();
-        heif.free();
 
-        const jpeg = await wasm_mozjpeg({
-          onRuntimeInitialized() {
-            console.log('wasm_mozjpeg loaded');
-          },
-        });
-        let output = jpeg.encode(rgba, dim.width, dim.height,
-          defaultJpegChannels, defaultJpegOption);
-        jpeg.free();
-
-        return new Blob([output], { type: 'image/jpeg' });
-      });
-
-    // cache blob
-    try {
-      const cache = await caches.open(cacheName);
-      const options = {statusText: cacheVersion}
-      cache.put(new Request(url), new Response(blob, options));
-    } catch(e) {
-      // ignore
-      console.log(e)
+      // cache blob
+      try {
+        const cache = await caches.open(cacheName);
+        const options = {statusText: cacheVersion}
+        cache.put(new Request(url), new Response(blob, options));
+      } catch(e) {
+        // ignore
+        console.log(e);
+      }
+      return URL.createObjectURL(blob);
+    } catch (e) {
+      // something went wrong
+      console.log(e);
     }
-    return URL.createObjectURL(blob);
   }
 
   // web worker
   onmessage = async function (e) {
-    e.data.urlPng = await convertHeicToPng(e.data.url);
-    postMessage(e.data);
+    const urlPng = await convertHeicToPng(e.data.url);
+    if (urlPng) {
+      e.data.urlPng = urlPng;
+      postMessage(e.data);
+    }
   }
 })()

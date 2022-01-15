@@ -1,7 +1,11 @@
 <!doctype html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
     <title>heic</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.0/vconsole.min.js"></script>
+    <script>var vConsole = new VConsole();</script>
     <script src="https://hu60.cn/tpl/jhin/js/jquery-3.1.1.min.js"></script>
     <style>
         img {
@@ -21,7 +25,7 @@
             x.addEventListener('error', async function() {
                 if (x.src.match(/\.hei[cf]\b/i)) {
                     if (!document.ConvertHeicToPng) {
-                        await $.getScript('/tpl/jhin/js/heif-web-display/dist/main.js?r=6');
+                        await $.getScript('/tpl/jhin/js/heif-web-display/dist/main.js?r=-3');
                     }
                     x.src = await document.ConvertHeicToPng(x.src);
                 }
