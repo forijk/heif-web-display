@@ -2,7 +2,7 @@
   importScripts('/tpl/jhin/js/heif-web-display/dist/wasm_heif.js');
 
   const cacheName = 'ConvertHeicToPng';
-  const cacheVersion = 'r=8';
+  const cacheVersion = 'r=9';
 
   console.print = console.log;
   console.log = function(...args) {
@@ -47,20 +47,6 @@
 
   async function convertHeicToPng(url) {
     try {
-      // find blob from cache
-      try {
-        const cache = await caches.open(cacheName);
-        const response = await cache.match(new Request(url));
-        if (response && response.statusText == cacheVersion) {
-          console.log('Found from Cache:', response.statusText, url);
-          const blob = await response.blob();
-          return URL.createObjectURL(blob);
-        }
-      } catch(e) {
-        // ignore
-        console.log(e);
-      }
-
       const data = await fetch(url);
       const array = new Uint8Array(await data.arrayBuffer());
       const heif = await wasm_heif({
@@ -82,7 +68,10 @@
       ctx.putImageData(imgData, 0, 0);
 
       console.log('convert to png...');
-      const blob = await canvas.convertToBlob();
+      const blob = await canvas.convertToBlob({
+        type: 'image/jpeg',
+        quality: 0.75,
+      });
 
       // cache blob
       try {
@@ -109,12 +98,35 @@
     }
   }
 
+  async function findCacheOrAddJob(data) {
+    // find blob from cache
+    try {
+      const cache = await caches.open(cacheName);
+      const response = await cache.match(new Request(data.url));
+      if (response && response.statusText == cacheVersion) {
+        console.log('Found from Cache:', response.statusText, data.url);
+        const blob = await response.blob();
+        const urlPng = URL.createObjectURL(blob);
+        if (urlPng) {
+          data.urlPng = urlPng;
+          postMessage(data);
+          return;
+        }
+      }
+    } catch(e) {
+      // ignore
+      console.log(e);
+    }
+    // cannot use a cache
+    jobQueue.add(data);
+  }
+
   // web worker
   onmessage = function (e) {
     if (e.data.blob) {
       OffscreenCanvas.resolve(e.data);
     } else {
-      jobQueue.add(e.data);
+      findCacheOrAddJob(e.data);
     }
   }
 })()
