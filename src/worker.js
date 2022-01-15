@@ -3,6 +3,7 @@
   importScripts('/tpl/jhin/js/heif-web-display/dist/wasm_mozjpeg.js');
 
   const cacheName = 'ConvertHeicToPng';
+  const cacheVersion = 'r=6';
   // 3 for RGB, 4 for RGBA (must adapt options.in_color_space!)
   const defaultJpegChannels = 4;
   const defaultJpegOption = {
@@ -29,20 +30,18 @@
 
   async function convertHeicToPng(url) {
     // find blob from cache
-    /*try {
+    try {
       const cache = await caches.open(cacheName);
       const response = await cache.match(new Request(url));
-      if (response) {
+      if (response && response.statusText == cacheVersion) {
+        console.log('Found from Cache:', url);
         const blob = await response.blob();
-        if (blob.type == 'image/jpeg') {
-          console.log('Found from Cache:', url);
-          return URL.createObjectURL(blob);
-        }
+        return URL.createObjectURL(blob);
       }
     } catch(e) {
       // ignore
       console.log(e)
-    }*/
+    }
 
     const blob = await fetch(url)
       .then(async (data) => {
@@ -69,13 +68,14 @@
       });
 
     // cache blob
-    /*try {
+    try {
       const cache = await caches.open(cacheName);
-      cache.put(new Request(url), new Response(blob));
+      const options = {statusText: cacheVersion}
+      cache.put(new Request(url), new Response(blob, options));
     } catch(e) {
       // ignore
       console.log(e)
-    }*/
+    }
     return URL.createObjectURL(blob);
   }
 
