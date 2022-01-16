@@ -7,6 +7,8 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.0/vconsole.min.js"></script>
     <script>var vConsole = new VConsole();</script>
     <script src="https://hu60.cn/tpl/jhin/js/jquery-3.1.1.min.js"></script>
+    <script src="https://hu60.cn/tpl/classic/js/humanize/humanize.js"></script>
+    <script src="/tpl/jhin/js/heif-web-display/dist/utils.js?r=11"></script>
     <style>
         img {
 	    max-width: 500px;
@@ -15,10 +17,16 @@
     </style>
 </head>
 <body>
-<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-ea17419b-c8fa-4dc9-b844-921ae49365a6/3e1a1d06-083f-4242-afbc-d39ee156a2c5.HEIC" alt="heic1" />
-<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-cc8cf08f-49f5-4fc5-83c3-ed2a683704d4/dbd3fea0-df18-4a10-8ccf-26b5de1ee42f.heic" alt="heic2" />
-<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-cc8cf08f-49f5-4fc5-83c3-ed2a683704d4/8b380294-064e-4564-bc02-16783e3a69e1.HEIC" alt="heic3" />
-
+<div class="image">
+    <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-ea17419b-c8fa-4dc9-b844-921ae49365a6/3e1a1d06-083f-4242-afbc-d39ee156a2c5.HEIC" alt="heic1" />
+    <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-cc8cf08f-49f5-4fc5-83c3-ed2a683704d4/dbd3fea0-df18-4a10-8ccf-26b5de1ee42f.heic" alt="heic2" />
+    <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-cc8cf08f-49f5-4fc5-83c3-ed2a683704d4/8b380294-064e-4564-bc02-16783e3a69e1.HEIC" alt="heic3" />
+</div>
+<hr/>
+<div class="utils">
+    <p>缓存大小: <span id="cache_size">计算中...</span></p>
+    <p><input id="clean_cache" type="button" value="清除缓存" /></p>
+</div>
 <script>
     (function() {
         document.querySelectorAll('img').forEach(async x => {
@@ -35,6 +43,20 @@
                 }
             })
         });
+
+        async function getCacheSize() {
+            const cacheSize = await document.HeicToPngCacheSize();
+            console.log(cacheSize);
+            document.querySelector('#cache_size').innerText = cacheSize.count + '条, ' + humanize.filesize(cacheSize.size);
+        }
+
+        async function cleanCache() {
+            await document.CleanHeicToPngCache();
+            getCacheSize();
+        }
+
+        window.addEventListener('load', getCacheSize);
+        document.querySelector('#clean_cache').addEventListener('click', cleanCache);
     })()
 </script>
 </body>
