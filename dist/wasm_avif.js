@@ -1,0 +1,1 @@
+wasm/avif/wasm_avif.js

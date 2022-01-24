@@ -1,0 +1,1 @@
+wasm/mozjpeg/wasm_mozjpeg.d.ts
