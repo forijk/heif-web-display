@@ -1,5 +1,6 @@
 (function() {
   importScripts('/tpl/jhin/js/heif-web-display/dist/wasm_heif.js');
+  importScripts('/tpl/jhin/js/heif-web-display/dist/wasm_avif.js');
 
   const cacheName = 'ConvertHeicToPng';
   const cacheVersion = 'r=11';
@@ -51,15 +52,21 @@
       postMessage({url: url, stat: '正在下载图片'});
       const data = await fetch(url);
       const array = new Uint8Array(await data.arrayBuffer());
-      const heif = await wasm_heif({
-        onRuntimeInitialized() {
-          console.log('decode heif...');
-          postMessage({url: url, stat: '正在解析图片文件'});
-        },
+      if (array.length < 12) {
+        postMessage({url: url, stat: '不是图片文件'});
+        return;
+      }
+      const isAVIF = (array[8] == 0x61 /*'a'*/);
+      const decodeFunc = isAVIF ? wasm_avif : wasm_heif;
+      const decoder = await decodeFunc({
+          onRuntimeInitialized() {
+            console.log('decode '+(isAVIF ? 'avif' : 'heif')+'...');
+            postMessage({url: url, stat: '正在解析图片文件'});
+          },
       });
-      const rgba = heif.decode(array, array.length, true);
-      const dim = heif.dimensions();
-      heif.free();
+      const rgba = decoder.decode(array, array.length, true);
+      const dim = decoder.dimensions();
+      decoder.free();
 
       console.log('draw to canvas...', dim);
       postMessage({url: url, stat: '正在绘制图片数据'});

@@ -21,6 +21,7 @@
     <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-ea17419b-c8fa-4dc9-b844-921ae49365a6/3e1a1d06-083f-4242-afbc-d39ee156a2c5.HEIC" alt="heic1" />
     <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-cc8cf08f-49f5-4fc5-83c3-ed2a683704d4/dbd3fea0-df18-4a10-8ccf-26b5de1ee42f.heic" alt="heic2" />
     <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-cc8cf08f-49f5-4fc5-83c3-ed2a683704d4/8b380294-064e-4564-bc02-16783e3a69e1.HEIC" alt="heic3" />
+    <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-cc8cf08f-49f5-4fc5-83c3-ed2a683704d4/2d33dd06-19cd-447a-88cc-bfcaff7adf10.avif" alt="avif1">
 </div>
 <hr/>
 <div class="utils">
@@ -30,8 +31,8 @@
 <script>
     (function() {
         document.querySelectorAll('img').forEach(async x => {
-            x.addEventListener('error', async function() {
-                if (x.src.match(/\.hei[cf]\b/i)) {
+            if (x.src.match(/\.(hei[cf]|avif)\b/i)) {
+                x.addEventListener('error', async function() {
                     if (!document.ConvertHeicToPng) {
                         if (!document.LoadConvertHeicToPng) {
                             document.LoadConvertHeicToPng = $.getScript('/tpl/jhin/js/heif-web-display/dist/main.js?r=11');
@@ -40,8 +41,8 @@
                     }
                     x.title = x.alt;
                     x.src = await document.ConvertHeicToPng(x.src, stat => x.alt = stat);
-                }
-            })
+                })
+            }
         });
 
         async function getCacheSize() {
