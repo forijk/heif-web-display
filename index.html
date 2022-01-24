@@ -6,9 +6,8 @@
     <title>heic</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.0/vconsole.min.js"></script>
     <script>var vConsole = new VConsole();</script>
-    <script src="https://hu60.cn/tpl/jhin/js/jquery-3.1.1.min.js"></script>
     <script src="https://hu60.cn/tpl/classic/js/humanize/humanize.js"></script>
-    <script src="/tpl/jhin/js/heif-web-display/dist/utils.js?r=11"></script>
+    <script src="/tpl/jhin/js/heif-web-display/dist/utils.js?r=12"></script>
     <style>
         img {
 	    max-width: 500px;
@@ -35,7 +34,7 @@
                 x.addEventListener('error', async function() {
                     if (!document.ConvertHeicToPng) {
                         if (!document.LoadConvertHeicToPng) {
-                            document.LoadConvertHeicToPng = $.getScript('/tpl/jhin/js/heif-web-display/dist/main.js?r=11');
+                            document.LoadConvertHeicToPng = import('/tpl/jhin/js/heif-web-display/dist/main.js?r=12');
                         }
                         await document.LoadConvertHeicToPng;
                     }

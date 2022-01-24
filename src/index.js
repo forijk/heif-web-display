@@ -1,5 +1,5 @@
 (function() {
-  const workerUrl = '/tpl/jhin/js/heif-web-display/dist/worker.js?r=-3';
+  const workerUrl = '/tpl/jhin/js/heif-web-display/dist/worker.js?r=12';
   const worker = new Worker(workerUrl);
   const promisePool = {};
   const statFuncPool = {};
