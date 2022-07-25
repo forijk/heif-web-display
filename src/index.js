@@ -40,7 +40,7 @@
       );
     } catch (e) {
       console.log(e);
-      statFuncPool[args.url]('图片解析失败，请尝试刷新: ' + JSON.stringify(e));
+      statFuncPool[args.url]('图片解析失败，请尝试刷新: ' + (e.toString ? e.toString() : JSON.stringify(e)));
     }
   }
 

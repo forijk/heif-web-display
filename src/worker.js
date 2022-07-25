@@ -100,7 +100,7 @@
       console.log(e);
       postMessage({
         url: url,
-        stat: '图片解析失败，请尝试刷新: ' + JSON.stringify(e),
+        stat: '图片解析失败，请尝试刷新: ' + (e.toString ? e.toString() : JSON.stringify(e)),
       });
       return null;
     }
